@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>个人成绩查询</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f1f1f1;
+    }
+
+    h1 {
+      text-align: center;
+      color: #333;
+    }
+
+    #grades {
+      margin: 20px auto;
+      max-width: 600px;
+      background-color: #fff;
+      padding: 20px;
+      border-radius: 5px;
+      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    }
+
+    .grade-item {
+      margin-bottom: 10px;
+    }
+
+    .course {
+      font-weight: bold;
+    }
+
+    .info {
+      color: #888;
+    }
+  </style>
+</head>
+<body>
+  <h1>教师任课信息查询</h1>
+  <div id="grades"></div>
+
+  <script>
+    // JavaScript代码，用于发送请求和处理返回的数据
+    // 使用AJAX发送GET请求到后端API获取学生成绩数据
+    function getStudentGrades() {
+      function replaceSpace(url) {
+        // 将 "%20" 替换为一个空格
+        const replacedUrl = url.replace("%20", " ");
+        return replacedUrl;
+        }
+        var token = '<%= token %>'
+        var realtoken=replaceSpace(token)
+      var xhr = new XMLHttpRequest();
+      xhr.open('GET', 'http://127.0.0.1:3007/TeachCourse', true); // 假设API地址为 '/api/student/grades'
+      xhr.setRequestHeader('Authorization',realtoken);
+      xhr.onload = function() {
+        if (xhr.status === 200) {
+          var grades = JSON.parse(xhr.responseText);
+          displayGrades(grades); // 调用函数展示成绩数据
+        } else {
+          console.error('请求出错:', xhr.status);
+        }
+      };
+      xhr.send();
+    }
+
+    // 在页面上展示学生成绩数据
+    function displayGrades(grades) {
+      var gradesContainer = document.getElementById('grades');
+
+      // 清空原有内容
+      console.log("输出页面");
+      gradesContainer.innerHTML = '';
+
+      // 遍历成绩数据，创建并添加HTML元素来展示成绩信息
+      for (var i = 0; i < grades.length; i++) {
+        console.log("输出页面2");
+        var Cname = grades[i].Cname;
+        var Cdate = grades[i].Cdate;
+        var Cmode = grades[i].Cmode;
+        var Ccredit = grades[i].Ccredit;
+        var Chour=grades[i].Chour
+
+        var gradeItem = document.createElement('div');
+        gradeItem.classList.add('grade-item');
+
+        var courseElement = document.createElement('div');
+        courseElement.classList.add('course');
+        courseElement.textContent = '课程：' + Cname;
+
+        var infoElement = document.createElement('div');
+        infoElement.classList.add('info');
+        infoElement.textContent = '开设学期：' + Cdate + '，考核方式：' + Cmode + '，学分：' + Ccredit+'，学时：'+Chour;
+
+        gradeItem.appendChild(courseElement);
+        gradeItem.appendChild(infoElement);
+        gradesContainer.appendChild(gradeItem);
+      
+      }
+    }
+
+    // 页面加载完成后，调用函数发送请求并展示学生成绩数据
+    window.onload = function() {
+      getStudentGrades();
+    };
+  </script>
+</body>
+</html>

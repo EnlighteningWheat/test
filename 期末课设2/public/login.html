@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <form id="loginForm">
+        邮箱<input type="text" name="email" id="emailInput"><br>
+        密码<input type="text" name="password" id="passwordInput"><br>
+        <input type="submit" value="登录">
+    </form>
+
+    <script>
+        const form = document.getElementById('loginForm');
+        const emailInput = document.getElementById('emailInput');
+        const passwordInput = document.getElementById('passwordInput');
+
+        form.addEventListener('submit', function(event) {
+            event.preventDefault(); // 阻止表单默认的提交行为
+
+            const email = emailInput.value;
+            const password = passwordInput.value;
+
+            const data = {
+                email: email,
+                password: password
+            };
+
+            fetch('http://127.0.0.1:3007/api/login', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(data)
+            })
+            .then(response => response.json())
+            .then(responseData => {
+                // 处理服务器返回的响应数据
+                console.log(responseData);
+
+                // 将返回的数据填充到账号输入框
+                emailInput.value = responseData.email;
+            })
+            .catch(error => {
+                // 处理请求错误
+                console.error('请求错误:', error);
+            });
+        });
+    </script>
+</body>
+</html>

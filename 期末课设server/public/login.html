@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login</title>
+    <style>
+        /* Center the box horizontally and vertically */
+        body {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            margin: 0;
+        }
+
+        /* Styling for the login box */
+        .login-box {
+            width: 300px;
+            padding: 20px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            background-color: #f5f5f5;
+        }
+
+        /* Styling for form elements */
+        .login-box input[type="text"],
+        .login-box input[type="password"],
+        .login-box input[type="submit"],
+        .login-box input[type="radio"] {
+            margin-bottom: 10px;
+        }
+
+        .login-box input[type="submit"] {
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            text-align: center;
+            text-decoration: none;
+            display: inline-block;
+            font-size: 16px;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+    <div class="login-box">
+        <form id="loginForm">
+            <label for="identity">身份:</label><br>
+            <input type="radio" name="id" value="student" class="identity"> 学生
+            <input type="radio" name="id" value="teacher" class="identity"> 教师
+            <input type="radio" name="id" value="manager" class="identity"> 管理员
+            <br><br>
+            <label for="email">账号:</label><br>
+            <input type="text" name="email" id="emailInput"><br><br>
+            <label for="password">密码:</label><br>
+            <input type="password" name="password" id="passwordInput"><br><br>
+            <input type="submit" value="登录">
+        </form>
+    </div>
+    
+    <script>
+        const form = document.getElementById('loginForm');
+const emailInput = document.getElementById('emailInput');
+const passwordInput = document.getElementById('passwordInput');
+
+form.addEventListener('submit', function(event) {
+    event.preventDefault(); // 阻止表单默认的提交行为
+
+    const email = emailInput.value;
+    const password = passwordInput.value;
+    const identityInputs = document.querySelectorAll('.identity');
+    let identity = '';
+
+    // 获取选中的身份
+    identityInputs.forEach(input => {
+        if (input.checked) {
+            identity = input.value;
+        }
+    });
+
+    const url = `http://127.0.0.1:3007/login?email=${email}&password=${password}&identity=${identity}`;
+    fetch(url, {
+        method: 'GET',
+        headers: {
+            'Content-Type': 'text/html'
+        }
+    })
+    .then(response => response.json())
+    .then(responseData => {
+        // 处理服务器返回的响应数据
+        console.log(responseData);
+        console.log(responseData.token)
+        // 如果验证成功，则跳转到后端发送的 URL 界面
+        if (responseData.message === '验证成功') {
+            const token=responseData.token
+            console.log('这里有东西');
+            console.log("开始执行跳转");
+            const redirectURL = responseData.url+'?token=' +  encodeURIComponent(token) ;
+            console.log("路径"+redirectURL)
+            window.location.href = redirectURL;
+        } else {
+            console.log(responseData.message);
+        }
+    })
+    .catch(error => {
+        // 处理请求错误
+        console.error('请求错误:', error);
+    });
+});
+
+    </script>
+    
+    
+</body>
+</html>

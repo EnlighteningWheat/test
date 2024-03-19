@@ -1,0 +1,379 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>学生管理界面</title>
+  <style>
+    #grades {
+      margin: 0;
+      max-width: 600px;
+      background-color: #fff;
+      padding: 20px;
+      border-radius: 5px;
+      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    }
+
+    .grade-item {
+      margin-bottom: 10px;
+    }
+
+    .course {
+      font-weight: bold;
+    }
+
+    .info {
+      color: #888;
+    }
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f5f5f5;
+      margin: 0;
+      padding: 20px;
+    }
+
+    h1 {
+      color: #333;
+    }
+
+    form {
+      background-color: #fff;
+      padding: 20px;
+      border-radius: 5px;
+      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+      margin-bottom: 20px;
+    }
+
+    label {
+      display: block;
+      margin-bottom: 10px;
+      font-weight: bold;
+    }
+
+    input[type="text"] {
+      width: 300px;
+      padding: 5px;
+      border: 1px solid #ccc;
+      border-radius: 3px;
+    }
+
+    input[type="submit"] {
+      padding: 10px 20px;
+      background-color: #4caf50;
+      color: #fff;
+      border: none;
+      border-radius: 3px;
+      cursor: pointer;
+    }
+    input[type="button"] {
+      padding: 10px 20px;
+      background-color: #4caf50;
+      color: #fff;
+      border: none;
+      border-radius: 3px;
+      cursor: pointer;
+    }
+
+    #message {
+      margin-top: 10px;
+      color: #4caf50;
+      font-weight: bold;
+    }
+
+    #message.error {
+      color: #f44336;
+    }
+  </style>
+</head>
+<body>
+  <h1>学生管理界面</h1>
+
+  <!-- 添加教师名单 -->
+  <form id="addTeacherForm">
+    <h2>添加学生名单</h2>
+    <label for="addName">姓名:</label>
+    <input type="text" id="addName" required><br><br>
+    
+    <label for="addGender">性别:</label>
+    <input type="text" id="addGender" required><br><br>
+    
+    <label for="addAge">年龄:</label>
+    <input type="text" id="addAge" required><br><br>
+    
+    <label for="addTitle">班级:</label>
+    <input type="text" id="addTitle" required><br><br>
+    
+    <label for="addPhone">户籍所在地:</label>
+    <input type="text" id="addPhone" required><br><br>
+    
+    <label for="addTeacherID">学号:</label>
+    <input type="text" id="addTeacherID" required><br><br>
+    
+    <input type="submit" name='tijiao' value="提交">
+    <input type="submit" name='xiugai' value="修改">
+  </form>
+
+  <!-- 查询教师名单 -->
+  <form id="queryTeacherForm">
+    <h2>查询学生名单</h2>
+    <label for="queryTeacherID">学号:</label>
+    <input type="text" id="queryTeacherID" required><br><br>
+    
+    <input type="submit" value="查询">
+    <div id="grades"></div>
+  </form>
+
+  <!-- 删除教师信息 -->
+  <form id="deleteTeacherForm">
+    <h2>删除学生信息</h2>
+    <label for="deleteTeacherID">学号:</label>
+    <input type="text" id="deleteTeacherID" required><br><br>
+    
+    <input type="submit" value="删除">
+  </form>
+   
+  <form id="loginForm">
+    <h2>修改学生密码</h2>
+    <label for="teacherID">学号:</label>
+    <input type="text" id="teacherID" required><br><br>
+
+    <label for="password">密码:</label>
+    <input type="text" id="password" required><br><br>
+
+    <input type="submit" value="提交">
+  </form>
+
+  <div id="message"></div>
+
+  <script>
+    //对token进行处理
+    var token = '<%= token %>'
+    function replacedUrl(url){
+        // 将 "%20" 替换为一个空格
+     const replacedUrl = url.replace("%20", " ");
+     return replacedUrl;
+    }
+    var realtoken=replacedUrl(token);
+
+    const addTeacherForm = document.getElementById('addTeacherForm');
+    const queryTeacherForm = document.getElementById('queryTeacherForm');
+    const deleteTeacherForm = document.getElementById('deleteTeacherForm');
+    const messageDiv = document.getElementById('message');
+
+    // 添加教师名单表单提交事件
+    addTeacherForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+
+      const name = document.getElementById('addName').value;
+      const gender = document.getElementById('addGender').value;
+      const age = document.getElementById('addAge').value;
+      const title = document.getElementById('addTitle').value;
+      const phone = document.getElementById('addPhone').value;
+      const teacherID = document.getElementById('addTeacherID').value;
+
+      const data = {
+        name: name,
+        gender: gender,
+        age: age,
+        title: title,
+        phone: phone,
+        teacherID: teacherID
+      };
+      var subUrl="http://127.0.0.1:3007/"
+      if (e.submitter.name === 'tijiao') {
+        subUrl=subUrl+"StudentIncrease"
+    // 提交按钮1的处理逻辑
+  } else if (e.submitter.name === 'xiugai') {
+    // 提交按钮2的处理逻辑
+       subUrl=subUrl+"StudentChange"
+  }
+      try {
+        const response = await fetch(subUrl, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': realtoken 
+          },
+          body: JSON.stringify(data)
+        });
+
+        const result = await response.json();
+
+        if (response.ok) {
+          // 提交成功
+          messageDiv.textContent = '提交成功';
+          messageDiv.classList.remove('error');
+          // 清空表单
+          addTeacherForm.reset();
+        } else {
+          // 提交失败
+          messageDiv.textContent = '提交失败: ' + result.error;
+          messageDiv.classList.add('error');
+        }
+      } catch (error) {
+        console.error('请求失败:', error);
+        messageDiv.textContent = '请求失败，请重试';
+        messageDiv.classList.add('error');
+      }
+    });
+
+    // 查询教师名单表单提交事件
+    queryTeacherForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+
+      const teacherID = document.getElementById('queryTeacherID').value;
+
+      const data = {
+        teacherID: teacherID
+      };
+
+      try {
+        const response = await fetch('http://127.0.0.1:3007/FindStudent', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': realtoken 
+          },
+          body: JSON.stringify(data)
+        });
+ 
+        const result = await response.json();
+        console.log(response)
+        if (response.ok) {
+          // 查询成功
+          // 在页面上展示查询结果
+          displayGrades(result);
+          
+          messageDiv.textContent = ''; // 清空消息提示
+        } else {
+          // 查询失败
+          messageDiv.textContent = '查询失败: ' + result.error;
+          messageDiv.classList.add('error');
+        }
+      } catch (error) {
+        console.error('请求失败:', error);
+        messageDiv.textContent = '请求失败，请重试';
+        messageDiv.classList.add('error');
+      }
+    });
+
+    // 删除教师信息表单提交事件
+    deleteTeacherForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+
+      const teacherID = document.getElementById('deleteTeacherID').value;
+
+      const data = {
+        teacherID: teacherID
+      };
+
+      try {
+        const response = await fetch('http://127.0.0.1:3007/deleteStudent', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': realtoken 
+          },
+          body: JSON.stringify(data)
+        });
+
+        const result = await response.json();
+
+        if (response.ok) {
+          // 删除成功
+          messageDiv.textContent = '删除成功';
+          messageDiv.classList.remove('error');
+          // 清空表单
+          deleteTeacherForm.reset();
+        } else {
+          // 删除失败
+          messageDiv.textContent = '删除失败: ' + result.error;
+          messageDiv.classList.add('error');
+        }
+      } catch (error) {
+        console.error('请求失败:', error);
+        messageDiv.textContent = '请求失败，请重试';
+        messageDiv.classList.add('error');
+      }
+    });
+    function displayGrades(grades) {
+      var gradesContainer = document.getElementById('grades');
+
+      // 清空原有内容
+      console.log("输出页面");
+      gradesContainer.innerHTML = '';
+
+      // 遍历成绩数据，创建并添加HTML元素来展示成绩信息
+      for (var i = 0; i < grades.length; i++) {
+        console.log("输出页面2");
+        var Tname = grades[i].Sname;
+        var Tsex = grades[i].Ssex;
+        var Tage = grades[i].Sage;
+        var Tpos = grades[i].Clno;
+        var Tpho=grades[i].Sareas;
+        var Sno=grades[i].Sno;
+
+        var gradeItem = document.createElement('div');
+        gradeItem.classList.add('grade-item');
+
+        var courseElement = document.createElement('div');
+        courseElement.classList.add('course');
+        courseElement.textContent = '姓名：' + Tname;
+
+        var infoElement = document.createElement('div');
+        infoElement.classList.add('info');
+        infoElement.textContent = "学号："+Sno+'，性别：' + Tsex+ '，年龄：' + Tage + '，班级：' + Tpos+'，户籍所在地：'+Tpho;
+
+
+        gradeItem.appendChild(courseElement);
+        gradeItem.appendChild(infoElement);
+        gradesContainer.appendChild(gradeItem);
+      
+      }
+    }
+    const loginForm = document.getElementById('loginForm');
+
+        loginForm.addEventListener('submit', async (e) => {
+        e.preventDefault();
+
+        const teacherID = document.getElementById('teacherID').value;
+        const password = document.getElementById('password').value;
+
+        const data = {
+            teacherID: teacherID,
+            password: password
+        };
+
+        try {
+            const response = await fetch('http://127.0.0.1:3007/MStudentPassword', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': realtoken 
+            },
+            body: JSON.stringify(data)
+            });
+              
+
+            
+            const result = await response.json();
+
+            if (response.ok) {
+            // 删除成功
+            messageDiv.textContent = '密码修改成功';
+            messageDiv.classList.remove('error');
+            // 清空表单
+            loginForm.reset();
+            } else {
+            // 删除失败
+            messageDiv.textContent = '密码修改失败 ' + result.error;
+            messageDiv.classList.add('error');
+            }
+            } catch (error) {
+                console.error('请求失败:', error);
+                messageDiv.textContent = '请求失败，请重试';
+                messageDiv.classList.add('error');
+            }
+            });
+
+  </script>
+</body>
+</html>

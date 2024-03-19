@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>提交学生成绩</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f5f5f5;
+      margin: 0;
+      padding: 20px;
+    }
+
+    h1 {
+      color: #333;
+    }
+
+    form {
+      background-color: #fff;
+      padding: 20px;
+      border-radius: 5px;
+      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    }
+
+    label {
+      display: block;
+      margin-bottom: 10px;
+      font-weight: bold;
+    }
+
+    input[type="text"] {
+      width: 300px;
+      padding: 5px;
+      border: 1px solid #ccc;
+      border-radius: 3px;
+    }
+
+    input[type="submit"] {
+      padding: 10px 20px;
+      background-color: #4caf50;
+      color: #fff;
+      border: none;
+      border-radius: 3px;
+      cursor: pointer;
+    }
+
+    #message {
+      margin-top: 10px;
+      color: #4caf50;
+      font-weight: bold;
+    }
+
+    #message.error {
+      color: #f44336;
+    }
+  </style>
+</head>
+<body>
+  <h1>提交学生成绩</h1>
+  
+  <form id="gradeForm">
+    <label for="courseName">课程号:</label>
+    <input type="text" id="courseName" required><br><br>
+    
+    <label for="studentID">学生学号:</label>
+    <input type="text" id="studentID" required><br><br>
+    
+    <label for="score">科目成绩:</label>
+    <input type="text" id="score" required><br><br>
+    
+    <input type="submit" value="提交">
+  </form>
+
+  <div id="message"></div>
+
+  <script>
+     var token = '<%= token %>'
+        function replacedUrl(url){
+        // 将 "%20" 替换为一个空格
+        const replacedUrl = url.replace("%20", " ");
+        return replacedUrl;
+        }
+        var realtoken=replacedUrl(token);
+    const gradeForm = document.getElementById('gradeForm');
+    const messageDiv = document.getElementById('message');
+
+    gradeForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+
+      const courseName = document.getElementById('courseName').value;
+      const studentID = document.getElementById('studentID').value;
+      const score = document.getElementById('score').value;
+
+      const data = {
+        Cno: courseName,
+        Sno: studentID,
+        Score: score
+      };
+
+      try {
+        const response = await fetch('http://127.0.0.1:3007/pushStudentScore', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': realtoken
+          },
+          body: JSON.stringify(data)
+        });
+
+        const result = await response.json();
+
+        if (response.ok) {
+          // 提交成功
+          messageDiv.textContent = '提交成功';
+          messageDiv.className = '';
+          // 清空表单
+          gradeForm.reset();
+        } else {
+          // 提交失败
+          messageDiv.textContent = '提交失败: ' + result.error;
+          messageDiv.className = 'error';
+        }
+      } catch (error) {
+        console.error('请求失败:', error);
+        messageDiv.textContent = '请求失败，请重试';
+        messageDiv.className = 'error';
+      }
+    });
+  </script>
+</body>
+</html>

@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<style>
+    .container {
+        display: flex;
+        flex-direction: row;
+    }
+
+    .button-box {
+        width: 200px;
+        background-color: #f2f2f2;
+        padding: 20px;
+        border-radius: 10px;
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    }
+
+    .button-box h2 {
+        margin-bottom: 10px;
+    }
+
+    .button-box button {
+        display: block;
+        margin-bottom: 10px;
+        padding: 10px 20px;
+        background-color: #4caf50;
+        color: white;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+    }
+
+    .button-box input[type="password"] {
+        display: block;
+        margin-bottom: 10px;
+        padding: 10px;
+        border-radius: 5px;
+    }
+
+    .content-box {
+        width: 100%;
+        height: 100vh;
+        border: 1px solid #ccc;
+        border-radius: 10px;
+    }
+
+    .content-iframe {
+        width: 100%;
+        height: 100%;
+        border: none;
+    }
+</style>
+</head>
+<body>
+<h1>教师功能</h1>
+
+<div class="container">
+    <div class="button-box">
+        <h2>个人基本信息</h2>
+        <button onclick="loadPage('TeacherInfo.html')">查询</button>
+
+        <h2>任课信息</h2>
+        <button onclick="loadPage('TeachCourse.html')">查询</button>
+
+        <h2>任课平均成绩</h2>
+        <button onclick="loadPage('AverageScore.html')">查询</button>
+         
+        <h2>所任课程学生成绩</h2>
+        <button onclick="loadPage('myStudentScore.html')">查询</button>
+         
+        <h2>提交所任课程学生成绩</h2>
+        <button onclick="loadPage('pushStudentScore.html')">查询</button>
+
+        <h2>修改个人密码</h2>
+        <input type="password" id="passwordInput" placeholder="请输入新密码">
+        <button onclick="changePassword()">修改</button>
+    </div>
+
+    <div class="content-box">
+        <iframe id="contentIframe" class="content-iframe"></iframe>
+    </div>
+</div>
+</body>
+<script>
+    var token = '<%= token %>'
+   function replacedUrl(url){
+   // 将 "%20" 替换为一个空格
+   const replacedUrl = url.replace("%20", " ");
+   return replacedUrl;
+   }
+   var realtoken=replacedUrl(token);
+   function loadPage(pageURL) {
+      
+       const contentIframe = document.getElementById('contentIframe');
+       contentIframe.src = "http://127.0.0.1:90/public/"+pageURL+'?token='+token;
+   }
+
+   
+   function changePassword() {
+   const newPassword = document.getElementById('passwordInput').value;
+   
+   // 创建一个包含新密码的对象
+   const data = { password: newPassword };
+
+   // 发送AJAX请求
+   const xhr = new XMLHttpRequest();
+   xhr.open('POST', 'http://127.0.0.1:3007/NewTpassword', true);
+   xhr.setRequestHeader('Content-Type', 'application/json');
+   xhr.setRequestHeader('Authorization',realtoken);
+   xhr.send(JSON.stringify(data));
+   xhr.onload = function() {
+       if (xhr.status === 200) {
+       // 请求成功处理
+       console.log('密码修改成功');
+       } else {
+       // 请求失败处理
+       console.error('密码修改失败:', xhr.status);
+       }
+   };
+  
+  
+   }
+
+</script>
+</html>

@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>学生信息展示</title>
+    <style>
+        .container {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+            width: 400px;
+            margin: 0 auto;
+            padding: 20px;
+            border: 1px solid #ccc;
+            border-radius: 10px;
+        }
+
+        .info-box {
+            margin-bottom: 10px;
+        }
+
+        .info-box label {
+            display: inline-block;
+            width: 100px;
+            font-weight: bold;
+        }
+
+        .info-box span {
+            font-weight: normal;
+        }
+
+        .total-credits {
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="info-box">
+            <label>姓名:</label>
+            <span id="name"></span>
+        </div>
+        <div class="info-box">
+            <label>性别:</label>
+            <span id="gender"></span>
+        </div>
+        <div class="info-box">
+            <label>年龄:</label>
+            <span id="age"></span>
+        </div>
+        <div class="info-box">
+            <label>班级:</label>
+            <span id="class"></span>
+        </div>
+        <div class="info-box">
+            <label>学号:</label>
+            <span id="studentId"></span>
+        </div>
+        <div class="info-box">
+            <label>地区:</label>
+            <span id="location"></span>
+        </div>
+        <div class="info-box total-credits">
+            <label>总学分:</label>
+            <span id="totalCredits"></span>
+        </div>
+    </div>
+
+    <script>
+
+        function replaceSpace(url) {
+        // 将 "%20" 替换为一个空格
+        const replacedUrl = url.replace("%20", " ");
+        return replacedUrl;
+        }
+        var token = '<%= token %>'
+        var realtoken=replaceSpace(token)
+        console.log(realtoken)
+        // 在页面加载时发送GET请求获取学生信息
+        document.addEventListener("DOMContentLoaded", function() {
+            fetch("http://127.0.0.1:3007/personalinfo", {
+    headers: {
+      'Authorization': realtoken // 替换为您的授权令牌
+    }
+  })
+                .then(response => response.json())
+                .then(data => {
+                    // 更新展示框中的内容
+                    document.getElementById('name').textContent = data.Sname;
+                    document.getElementById('gender').textContent = data.Ssex;
+                    document.getElementById('age').textContent = data.Sage;
+                    document.getElementById('class').textContent = data.Clno;
+                    console.log("班级是"+data.Clno)
+                    document.getElementById('studentId').textContent = data.Sno;
+                    document.getElementById('location').textContent = data.Sareas;
+                    document.getElementById('totalCredits').textContent = data.Scredits;
+                })
+                .catch(error => {
+                    console.error("Error fetching student information:", error);
+                });
+        });
+    </script>
+</body>
+</html>
